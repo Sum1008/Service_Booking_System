@@ -33,7 +33,7 @@ public class Ad {
     private Double price;
 
     @Lob
-    @Column(columnDefinition = "longlob")
+    @Column(columnDefinition = "LONGBLOB")
     private byte[] img;
 
     @ManyToOne(fetch= FetchType.LAZY,optional=false)
