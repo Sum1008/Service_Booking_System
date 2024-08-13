@@ -11,6 +11,8 @@ import com.codeSumit.ServiceBookingSystem.entity.Ad;
 public interface AdRepository extends JpaRepository<Ad,Long>{
 
     List<Ad> findAllByUserId(Long userId);
+
+    List<Ad> findAllByServiceNameContaining(String name);
     
 
 }
