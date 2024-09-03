@@ -14,5 +14,4 @@ public interface AdRepository extends JpaRepository<Ad,Long>{
 
     List<Ad> findAllByServiceNameContaining(String name);
     
-
 }

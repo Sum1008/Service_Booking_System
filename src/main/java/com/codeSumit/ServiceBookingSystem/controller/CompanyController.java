@@ -1,6 +1,7 @@
 package com.codeSumit.ServiceBookingSystem.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codeSumit.ServiceBookingSystem.dto.AdDTO;
+import com.codeSumit.ServiceBookingSystem.dto.ReservationDTO;
 import com.codeSumit.ServiceBookingSystem.service.company.CompanyService;
 
 @RestController
@@ -81,6 +83,19 @@ public class CompanyController {
 
 
 
+    @GetMapping("/bookings/{companyId}")
+    public ResponseEntity<List<ReservationDTO>> getAllAdBookings(@PathVariable Long companyId){ 
+        return ResponseEntity.ok(companyService.getAllAdBookings(companyId));
+    }
 
+
+
+
+    @GetMapping("/booking/{bookingId}/{status}")
+    public ResponseEntity<?> changeBookingStatus(@PathVariable Long bookingId,@PathVariable String status){
+        boolean success=companyService.changeBookingStatus(bookingId, status);
+        if(success) return ResponseEntity.ok().build();
+        return ResponseEntity.notFound().build();
+    }
 
 }

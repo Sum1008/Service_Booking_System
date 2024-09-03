@@ -34,6 +34,4 @@ public class ReservationDTO {
     private long adId;
 
 
-
-
 }

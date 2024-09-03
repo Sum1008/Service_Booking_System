@@ -1,5 +1,6 @@
 package com.codeSumit.ServiceBookingSystem.service.client;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -11,13 +12,16 @@ import com.codeSumit.ServiceBookingSystem.dto.AdDTO;
 import com.codeSumit.ServiceBookingSystem.dto.AdDetailsForClientDTO;
 import com.codeSumit.ServiceBookingSystem.entity.Ad;
 import com.codeSumit.ServiceBookingSystem.entity.Reservation;
+import com.codeSumit.ServiceBookingSystem.entity.Review;
 import com.codeSumit.ServiceBookingSystem.entity.User;
 import com.codeSumit.ServiceBookingSystem.entity.enums.ReservationStatus;
 import com.codeSumit.ServiceBookingSystem.entity.enums.ReviewStatus;
 import com.codeSumit.ServiceBookingSystem.repository.AdRepository;
 import com.codeSumit.ServiceBookingSystem.repository.ReservationRepository;
+import com.codeSumit.ServiceBookingSystem.repository.ReviewRepository;
 import com.codeSumit.ServiceBookingSystem.repository.UserRepository;
 import com.codeSumit.ServiceBookingSystem.dto.ReservationDTO;
+import com.codeSumit.ServiceBookingSystem.dto.ReviewDTO;
 @Service
 public class ClientServiceImpl implements ClientService {
 
@@ -29,6 +33,10 @@ public class ClientServiceImpl implements ClientService {
 
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
+
 
     public List<AdDTO> getAllAds(){
 
@@ -68,6 +76,8 @@ public class ClientServiceImpl implements ClientService {
 
         if(optionalAd.isPresent()){
             adDetailsForClientDTO.setAdDTO(optionalAd.get().getAdDto());
+            List<Review> reviewList=reviewRepository.findAllByAdId(adId);
+            adDetailsForClientDTO.setReviewDTOList(reviewList.stream().map(Review::getDto).collect(Collectors.toList()));
 
         }
         return adDetailsForClientDTO;
@@ -75,5 +85,41 @@ public class ClientServiceImpl implements ClientService {
     }
 
     
+    public List<ReservationDTO> getAllBookingByUserId(Long  userId){
+
+        return reservationRepository.findAllByUserId(userId).stream().map(Reservation::getReservationDto).collect(Collectors.toList());
+        
+    }
+
+    public Boolean giveReview(ReviewDTO reviewDTO){
+        
+        Optional<User> optionalUser=userRepository.findById(reviewDTO.getUserId());
+        Optional<Reservation> optionalBooking=reservationRepository.findById(reviewDTO.getBookId());
+
+        if(optionalUser.isPresent() && optionalBooking.isPresent()){
+            Review review=new Review();
+
+            review.setReviewData(new Date());
+            review.setReview(reviewDTO.getReview());
+            review.setRating(reviewDTO.getRating());
+
+            review.setUser(optionalUser.get());
+            review.setAd(optionalBooking.get().getAd());
+
+            reviewRepository.save(review);
+
+            Reservation booking =optionalBooking.get();
+            booking.setReviewStatus(ReviewStatus.TRUE);
+
+            reservationRepository.save(booking);
+
+            return true;
+
+            
+        }
+        return false;
+        
+
+    }
 
 }
